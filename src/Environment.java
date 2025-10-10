@@ -5,19 +5,20 @@ import java.util.*;
 public class Environment {
 
 
-    private int height; //grid height
-    private int width; //grid width
-    private int goalX;
-    private int goalY;
+    private final int height; //grid height
+    private final int width; //grid width
+    private final int goalX;
+    private final int goalY;
 
-    private State[] states;
-    private Action[] actions;
-    private Map<State, Integer> stateToIndexMap;
-    private int[][] gridWorld;
-    private double[][] qTable;
+    private final State[] states;
+    private final Action[] actions;
+    private final Map<State, Integer> stateToIndexMap;
+    private final double[][] qTable;
 
     private Agent agent;
     private double epsilon = 1;
+
+    private int episodeCount = 0;
 
 
     Random random = new Random();
@@ -28,7 +29,6 @@ public class Environment {
         this.height = height;
         this.width = width;
         actions = Action.values();
-        gridWorld = new int[height][width];
         states = new State[height*width];
         initializeStates();
 
@@ -58,6 +58,7 @@ public class Environment {
 
     public void startTrainingLoop(){
         initializeNewEpisode();
+        System.out.println("Start new episode");
 
         for (int i = 0; i < Constants.NUMBER_OF_LOOPS ; i++) {
             Action action = chooseBestAction(stateToIndexMap.get(agent.getCurrentState()),epsilon);
@@ -70,6 +71,8 @@ public class Environment {
                 initializeNewEpisode();
                 epsilon *= 0.995; // slowly reduce exploration
                 epsilon = Math.max(0.1, epsilon); // don’t go below 0.1
+                episodeCount++;
+                System.out.println("Episode: " + episodeCount);
                 continue;
             }
             updateQValue(currentStateIndex,action.ordinal(),currentReward,nextStateIndex);
@@ -86,7 +89,7 @@ public class Environment {
         for (int i = 0; i < this.height; i++) {
             for (int j = 0; j < this.width; j++) {
                 boolean isTerminal = (i == goalY && j == goalX);
-                int reward = isTerminal ? 10 : 0;
+                double reward = isTerminal ? 10 : -0.01;
                 states[index] = new State(j,i,isTerminal,reward);
                 index++;
             }
@@ -122,7 +125,7 @@ public class Environment {
     private double makeAction(Action action) {
         int newX = agent.getX();
         int newY = agent.getY();
-        System.out.println("X : " + newX + "Y: " + newY + "Action: " + action);
+        System.out.println("X : " + newX + " Y: " + newY + " Action: " + action);
         double reward;
 
         switch (action) {
@@ -209,13 +212,19 @@ public class Environment {
         }
     }
 
-    public void testModel(){
-        initializeNewEpisode();
-        while (!agent.getCurrentState().isTerminal()){
-            System.out.println("X: " + agent.getX() + " Y: " + agent.getY());
-            Action action = chooseBestAction(stateToIndexMap.get(agent.getCurrentState()),epsilon);
-            makeAction(action);
-            System.out.println("Action: " + action);
+    public void testModel(int numberOfEpisodes){
+        int totalSteps = 0;
+        for(int i = 0; i < numberOfEpisodes; i++) {
+            initializeNewEpisode();
+            while (!agent.getCurrentState().isTerminal()) {
+                totalSteps++;
+//                System.out.println("X: " + agent.getX() + " Y: " + agent.getY());
+                Action action = chooseBestAction(stateToIndexMap.get(agent.getCurrentState()), 0.1);
+                makeAction(action);
+//                System.out.println("Action: " + action);
+            }
         }
+        System.out.println("Number of episodes: " + numberOfEpisodes);
+        System.out.println("Average steps: " + (double)totalSteps/numberOfEpisodes);
     }
 }

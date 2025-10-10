@@ -7,6 +7,6 @@ public class Main{
 //        environment.saveQTableToFile();
 
         environment.loadQTableFromFile();
-        environment.testModel();
+        environment.testModel(100);
     }
 }
