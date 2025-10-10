@@ -49,7 +49,10 @@ public class Environment {
             startState = states[random.nextInt(states.length)];
         }while (startState.isTerminal());
 
-        agent = Agent.getAgent(startState);
+        agent = Agent.getAgent();
+        agent.setCurrentState(startState);
+        agent.setX(agent.getCurrentState().getX());
+        agent.setY(agent.getCurrentState().getY());
     }
 
 
@@ -96,10 +99,12 @@ public class Environment {
                     Constants.LEARNING_RATE *(currentReward-
                             qTable[currentStateIndex][currentActionIndex]);
         }
-        qTable[currentStateIndex][currentActionIndex] +=
-                Constants.LEARNING_RATE *(currentReward+
-                        Constants.DISCOUNT_FACTOR*getMaxQValue(nextStateIndex)-
-                        qTable[currentStateIndex][currentActionIndex]);
+        else {
+            qTable[currentStateIndex][currentActionIndex] +=
+                    Constants.LEARNING_RATE * (currentReward +
+                            Constants.DISCOUNT_FACTOR * getMaxQValue(nextStateIndex) -
+                            qTable[currentStateIndex][currentActionIndex]);
+        }
     }
 
 
