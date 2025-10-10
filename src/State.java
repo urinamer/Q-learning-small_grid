@@ -4,13 +4,20 @@ public class State {
     private int x;
     private int y;
     private double reward;
-    boolean isTerminal;
+    private boolean isTerminal;
 
     public State(int x, int y,boolean isTerminal,double reward) {
         this.x = x;
         this.y = y;
         this.isTerminal = isTerminal;
         this.reward = reward;
+    }
+
+    public State(int y, int x) {
+        this.y = y;
+        this.x = x;
+        this.isTerminal = false;
+        this.reward = 0;
     }
 
     public int getX() {
@@ -36,7 +43,10 @@ public class State {
         return x == state.x && y == state.y;
     }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, reward, isTerminal);
+    }
 
     public double getReward() {
         return reward;

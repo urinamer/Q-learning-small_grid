@@ -3,15 +3,14 @@ public class Agent {
     private int x,y;
     private State currentState;
 
-    private Agent(int x,int y) {
+    private Agent() {
         //private constructor for singleton
-        this.x = x;
-        this.y = y;
+
     }
 
-    public static Agent getAgent(int x,int y) { // Singleton object
+    public static Agent getAgent() { // Singleton object
         if(agent == null) {
-            agent = new Agent(x,y);
+            agent = new Agent();
         }
 
         return agent;
